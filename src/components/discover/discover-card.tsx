@@ -1,9 +1,9 @@
-import { Colors } from '@/constants/theme';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Card } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import {
+  Colors,
   Radius,
   Shadows,
   Spacing,
@@ -13,6 +13,9 @@ import { useTheme } from '@/hooks/use-theme';
 
 type DiscoverCardProps = {
   height?: number;
+  heightLabel: string;
+  sex: string;
+  lookingFor: string;
   city: string;
   resonance: number;
   note: string;
@@ -29,6 +32,9 @@ type DiscoverCardProps = {
 
 export function DiscoverCard({
   height,
+  heightLabel,
+  sex,
+  lookingFor,
   city,
   resonance,
   note,
@@ -63,13 +69,13 @@ export function DiscoverCard({
       >
         {/* HERO IMAGE */}
         <View style={styles.hero}>
-          {photos[0] && (
+          {photos[0] ? (
             <Image
               source={photos[0]}
               style={styles.heroImage}
               resizeMode="cover"
             />
-          )}
+          ) : null}
 
           <View style={styles.heroShade} />
 
@@ -102,10 +108,6 @@ export function DiscoverCard({
                 {neighborhood.toUpperCase()} · {city.toUpperCase()}
               </Text>
             </View>
-
-            <Text style={styles.plateText}>
-              PLATE 01
-            </Text>
           </View>
         </View>
 
@@ -140,6 +142,19 @@ export function DiscoverCard({
 
         {/* BIO */}
         <View style={styles.section}>
+          <View style={styles.attributes}>
+            {[heightLabel, sex, lookingFor].map((value, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.attributePill,
+                  { borderColor: theme.border, backgroundColor: theme.backgroundElement },
+                ]}
+              >
+                <Text type="bodySans" style={styles.attributeText}>{value}</Text>
+              </View>
+            ))}
+          </View>
           <Text type="label" style={styles.sectionLabel}>
             BIO & PERSONA
           </Text>
@@ -171,7 +186,9 @@ export function DiscoverCard({
             <View
               style={[
                 styles.questionDivider,
-                { backgroundColor: theme.border },
+                {
+                  backgroundColor: theme.border,
+                },
               ]}
             />
 
@@ -207,34 +224,23 @@ export function DiscoverCard({
           </View>
         </View>
 
-        {/* PHOTOGRAPHIC SALON */}
-        {photos[1] && (
-          <View style={styles.section}>
-            <View style={styles.salonHeader}>
-              <Text type="label" style={styles.sectionLabel}>
-                PHOTOGRAPHIC SALON
-              </Text>
-
-              <Text style={styles.viewAll}>
-                02 PHOTOGRAPHS
-              </Text>
-            </View>
-
-            <View style={styles.secondImageContainer}>
-              <Image
-                source={photos[1]}
-                style={styles.secondImage}
-                resizeMode="cover"
-              />
-
-              <View style={styles.secondImageShade} />
-
-              <Text style={styles.secondPlate}>
-                PLATE 02 · PHOTOGRAPHY
-              </Text>
-            </View>
+        {/* NORMAL SECOND PROFILE PHOTO */}
+        {photos[1] ? (
+          <View
+            style={[
+              styles.profilePhotoSection,
+              {
+                backgroundColor: theme.backgroundElement,
+              },
+            ]}
+          >
+            <Image
+              source={photos[1]}
+              style={styles.profilePhoto}
+              resizeMode="contain"
+            />
           </View>
-        )}
+        ) : null}
 
         {/* FRIENDS SAY */}
         <View style={[styles.section, styles.friendsSection]}>
@@ -282,13 +288,14 @@ const styles = StyleSheet.create({
   },
 
   heroTopRow: {
-    flexWrap: 'wrap',
     position: 'absolute',
     top: 16,
     left: 16,
     right: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
     gap: 8,
   },
 
@@ -297,18 +304,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 11,
     paddingVertical: 7,
     borderRadius: Radius.full,
-    backgroundColor: 'rgba(247,245,239,0.92)',
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
   },
 
   heroPillText: {
     fontFamily: Typography.bodySans.fontFamily,
-    fontSize: 10,
+    fontSize: 8,
     lineHeight: 14,
-    fontWeight: '700',
-    letterSpacing: 1.1,
+    fontWeight: '600',
+    letterSpacing: 0.6,
     color: Colors.light.text,
   },
 
@@ -320,7 +327,6 @@ const styles = StyleSheet.create({
   },
 
   heroBottom: {
-    flexWrap: 'wrap',
     position: 'absolute',
     left: 18,
     right: 18,
@@ -338,14 +344,14 @@ const styles = StyleSheet.create({
   heroName: {
     fontFamily: Typography.display.fontFamily,
     fontSize: 39,
-    lineHeight: 42,
+    lineHeight: 40,
     fontWeight: '400',
     letterSpacing: -1.1,
     color: Colors.light.onAccent,
-    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
     textShadowRadius: 8,
   },
@@ -353,29 +359,19 @@ const styles = StyleSheet.create({
   heroAge: {
     fontFamily: Typography.body.fontFamily,
     fontSize: 25,
-    lineHeight: 30,
-    fontWeight: '400',
+    lineHeight: 40,
+    fontWeight: '600',
     color: Colors.light.onAccent,
   },
 
   heroLocation: {
     fontFamily: Typography.bodySans.fontFamily,
-    marginTop: 4,
-    fontSize: 10,
-    lineHeight: 14,
-    fontWeight: '700',
-    letterSpacing: 1.5,
+    marginTop: 2,
+    fontSize: 9,
+    lineHeight: 12,
+    fontWeight: '500',
+    letterSpacing: 1.1,
     color: Colors.light.onAccent,
-    opacity: 0.92,
-  },
-
-  plateText: {
-    fontFamily: Typography.bodySans.fontFamily,
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 1.4,
-    color: Colors.light.onAccent,
-    opacity: 0.9,
   },
 
   /* RESONANCE */
@@ -390,43 +386,45 @@ const styles = StyleSheet.create({
   },
 
   resonanceHeadingRow: {
-    flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 10,
+    flexWrap: 'wrap',
+    gap: 8,
     marginBottom: Spacing.three,
   },
 
   resonanceLabelRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 7,
+    gap: 5,
     flexShrink: 1,
   },
 
   smallLabel: {
     fontFamily: Typography.bodySans.fontFamily,
-    fontSize: 10,
-    lineHeight: 14,
+    fontSize: 9,
+    lineHeight: 12,
+    fontWeight: '500',
+    letterSpacing: 0.3,
   },
 
   concordanceText: {
-    fontFamily: Typography.body.fontFamily,
-    fontStyle: 'italic',
-    fontSize: 12,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
     lineHeight: 16,
     opacity: 0.58,
   },
 
   resonanceQuote: {
     fontFamily: Typography.body.fontFamily,
-    fontStyle: 'italic',
-    fontSize: 17,
-    lineHeight: 25,
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '400',
+    letterSpacing: 0.1,
   },
 
-  /* SECTIONS */
+  /* GENERAL SECTIONS */
 
   section: {
     marginTop: Spacing.five,
@@ -435,16 +433,44 @@ const styles = StyleSheet.create({
 
   sectionLabel: {
     opacity: 0.62,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
+    fontWeight: '500',
+    letterSpacing: 0.7,
+  },
+
+  attributes: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.two,
+    marginBottom: Spacing.three,
+  },
+
+  attributePill: {
+    maxWidth: '100%',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.one,
+  },
+
+  attributeText: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '500',
   },
 
   bioText: {
     marginTop: Spacing.three,
     fontFamily: Typography.body.fontFamily,
-    fontSize: 18,
-    lineHeight: 27,
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '400',
+    letterSpacing: 0.05,
   },
 
-  /* QUESTION */
+  /* FUN QUESTION */
 
   questionBox: {
     marginTop: Spacing.three,
@@ -455,8 +481,8 @@ const styles = StyleSheet.create({
 
   questionText: {
     fontFamily: Typography.heading.fontFamily,
-    fontSize: 19,
-    lineHeight: 26,
+    fontSize: 15,
+    lineHeight: 20,
     fontWeight: '500',
   },
 
@@ -469,9 +495,9 @@ const styles = StyleSheet.create({
   answerText: {
     fontFamily: Typography.body.fontFamily,
     fontStyle: 'italic',
-    fontSize: 17,
-    lineHeight: 25,
-    opacity: 0.75,
+    fontSize: 14,
+    lineHeight: 20,
+    opacity: 0.85,
   },
 
   /* TAGS */
@@ -498,59 +524,19 @@ const styles = StyleSheet.create({
     letterSpacing: 0.1,
   },
 
-  /* PHOTO SALON */
+  /* SECOND PROFILE PHOTO */
 
-  salonHeader: {
-    flexWrap: 'wrap',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 12,
-  },
-
-  viewAll: {
-    fontFamily: Typography.bodySans.fontFamily,
-    fontSize: 10,
-    lineHeight: 14,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    opacity: 0.5,
-  },
-
-  secondImageContainer: {
-    aspectRatio: 1,
-    marginTop: Spacing.three,
+  profilePhotoSection: {
+    marginHorizontal: Spacing.four,
+    marginTop: Spacing.five,
+    height: 430,
     borderRadius: Radius.lg,
     overflow: 'hidden',
-    position: 'relative',
   },
 
-  secondImage: {
+  profilePhoto: {
     width: '100%',
     height: '100%',
-  },
-
-  secondImageShade: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(0,0,0,0.08)',
-  },
-
-  secondPlate: {
-    fontFamily: Typography.bodySans.fontFamily,
-    position: 'absolute',
-    left: 14,
-    bottom: 12,
-    color: Colors.light.onAccent,
-    fontSize: 10,
-    lineHeight: 11,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    textShadowColor: 'rgba(0,0,0,0.45)',
-    textShadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    textShadowRadius: 5,
   },
 
   /* FRIENDS */
@@ -563,8 +549,8 @@ const styles = StyleSheet.create({
     marginTop: Spacing.three,
     fontFamily: Typography.body.fontFamily,
     fontStyle: 'italic',
-    fontSize: 21,
-    lineHeight: 30,
-    letterSpacing: -0.2,
+    fontSize: 16,
+    lineHeight: 22,
+    letterSpacing: -0.1,
   },
 });

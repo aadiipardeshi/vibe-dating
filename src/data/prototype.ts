@@ -5,6 +5,7 @@ const secondPhoto = require('@/assets/images/profilepic2.jpg');
 export const people = [
   {
     id: 'maya', name: 'Maya', age: 27, neighborhood: 'Koregaon Park', city: 'Pune',
+    heightLabel: `5'7"`, sex: 'Female', lookingFor: 'Date Me',
     occupation: 'Architect', resonance: 87, photos: [accountPhoto, secondPhoto] as number[],
     bio: 'Architect by day, explorer by weekend. Drawn to quiet mornings, forgotten bookshops and unscripted road journeys.',
     tags: ['Coastal Hikes', 'Filter Coffee', '35mm Film', 'Architecture', 'Vinyl'],
@@ -17,6 +18,7 @@ export const people = [
   },
   {
     id: 'anika', name: 'Anika', age: 25, neighborhood: 'Baner', city: 'Pune',
+    heightLabel: `5'5"`, sex: 'Female', lookingFor: 'Relationship',
     occupation: 'Designer', resonance: 92, photos: [secondPhoto, accountPhoto] as number[],
     bio: 'Collecting little moments: morning markets, art galleries and long lunches. Always looking for the scenic route home.',
     tags: ['Art Galleries', 'Sunday Markets', 'Design', 'Long Lunches', 'Travel'],

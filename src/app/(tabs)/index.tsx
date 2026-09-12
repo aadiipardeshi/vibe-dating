@@ -286,6 +286,9 @@ export default function DiscoverScreen() {
           <View style={styles.nextCard} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
             <DiscoverCard
               height={cardHeight}
+              heightLabel={nextProfile.heightLabel}
+              sex={nextProfile.sex}
+              lookingFor={nextProfile.lookingFor}
               city={nextProfile.city}
               resonance={nextProfile.resonance}
               note={nextProfile.note}
@@ -318,6 +321,9 @@ export default function DiscoverScreen() {
           <DiscoverCard
             key={currentProfile.id}
             height={cardHeight}
+            heightLabel={currentProfile.heightLabel}
+            sex={currentProfile.sex}
+            lookingFor={currentProfile.lookingFor}
             city={currentProfile.city}
             resonance={currentProfile.resonance}
             note={currentProfile.note}
