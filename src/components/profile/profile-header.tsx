@@ -9,15 +9,14 @@ export function ProfileHeader({ name, age, neighborhood, bio }: ProfileHeaderPro
   return (
     <View style={styles.wrap}>
       <Image source={accountPhoto} accessibilityLabel="Your profile photograph" style={styles.photo} contentFit="cover" />
-      <Text type="label" tone="textSecondary">THE PERSON BEHIND THE PROFILE</Text>
-      <Text type="display">{name}{age ? `, ${age}` : ''}</Text>
-      <Text type="label" tone="textSecondary">{neighborhood.toUpperCase()}</Text>
-      <Text style={styles.bio} tone="textSecondary">{bio}</Text>
+      <Text type="title">{name}{age ? `, ${age}` : ''}</Text>
+      <Text type="bodySans" tone="textSecondary" style={styles.bio}>{neighborhood}</Text>
+      <Text type="bodySans" style={styles.bio} tone="textSecondary">{bio}</Text>
     </View>
   );
 }
 const styles = StyleSheet.create({
   wrap: { gap: Spacing.three },
-  photo: { width: '100%', aspectRatio: 1.1, borderRadius: Radius.lg, marginBottom: Spacing.three },
-  bio: { marginTop: Spacing.two },
+  photo: { width: '100%', aspectRatio: 1.4, borderRadius: Radius.lg, marginBottom: Spacing.three },
+  bio: { fontSize: 14, lineHeight: 21 },
 });

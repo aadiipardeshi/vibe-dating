@@ -13,10 +13,9 @@ export function EditorialModal({ visible, title, onClose, children }: { visible:
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.keyboard}>
         <View accessibilityViewIsModal style={[styles.sheet, { backgroundColor: theme.surface, borderColor: theme.border }]}>
           <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
-            <Text type="label" tone="textSecondary">VIBE · PRIVATE EDITION</Text>
-            <Text type="title" accessibilityRole="header">{title}</Text>
+            <Text type="bodySans" style={{ fontSize: 24, lineHeight: 30, fontWeight: '600' }} accessibilityRole="header">{title}</Text>
             {children}
-            <Button variant="ghost" onPress={onClose}>CLOSE</Button>
+            <Button variant="ghost" onPress={onClose}>Close</Button>
           </ScrollView>
         </View>
       </KeyboardAvoidingView>

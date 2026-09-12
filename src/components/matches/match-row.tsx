@@ -1,125 +1,27 @@
 import { StyleSheet, View } from 'react-native';
+import { Avatar, Text } from '@/components/ui';
+import { Spacing } from '@/constants/theme';
 
-import { Avatar } from '@/components/ui/avatar';
-import { Text } from '@/components/ui/text';
-import {
-  Spacing,
-  Typography,
-} from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
-
-type MatchRowProps = {
-  name: string;
-  preview: string;
-  photo?: number;
-  time?: string;
-};
-
-export function MatchRow({
-  name,
-  preview,
-  photo,
-  time,
-}: MatchRowProps) {
-  const theme = useTheme();
-
+type MatchRowProps = { name: string; preview: string; photo?: number; time?: string };
+export function MatchRow({ name, preview, photo, time }: MatchRowProps) {
   return (
     <View style={styles.row}>
-      <View style={styles.avatarWrap}>
-        <Avatar name={name} source={photo} />
-
-      </View>
-
+      <Avatar name={name} source={photo} size={46} />
       <View style={styles.copy}>
         <View style={styles.topRow}>
-          <Text style={styles.name}>
-            {name}
-          </Text>
-
-          <Text
-            style={[
-              styles.time,
-              {
-                color: theme.textTertiary,
-              },
-            ]}
-          >
-            {time}
-          </Text>
+          <Text type="bodySans" style={styles.name} numberOfLines={1}>{name}</Text>
+          <Text type="bodySans" tone="textSecondary" style={styles.time}>{time}</Text>
         </View>
-
-        <View style={styles.previewRow}>
-          <Text
-            style={[
-              styles.preview,
-              {
-                color: theme.textSecondary,
-              },
-            ]}
-            numberOfLines={1}
-          >
-            {preview}
-          </Text>
-
-        </View>
+        <Text type="bodySans" tone="textSecondary" style={styles.preview} numberOfLines={1}>{preview}</Text>
       </View>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  row: {
-    minHeight: 78,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingHorizontal: Spacing.two,
-    paddingVertical: Spacing.three,
-  },
-
-  avatarWrap: {
-    position: 'relative',
-  },
-
-  copy: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
-    gap: Spacing.three,
-  },
-
-  name: {
-    flex: 1,
-    fontFamily: Typography.heading.fontFamily,
-    fontSize: 18,
-    lineHeight: 23,
-    fontWeight: '400',
-  },
-
-  time: {
-    fontFamily: Typography.bodySans.fontFamily,
-    fontSize: 10,
-    lineHeight: 14,
-    fontWeight: '600',
-    letterSpacing: 0.8,
-  },
-
-  previewRow: {
-    marginTop: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.two,
-  },
-
-  preview: {
-    flex: 1,
-    fontFamily: Typography.bodySans.fontFamily,
-    fontSize: 13,
-    lineHeight: 18,
-  },
+  row: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: Spacing.three, paddingVertical: Spacing.three },
+  copy: { flex: 1, minWidth: 0, gap: Spacing.one },
+  topRow: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.two },
+  name: { flex: 1, fontSize: 15, lineHeight: 21, fontWeight: '600' },
+  time: { fontSize: 11, lineHeight: 16 },
+  preview: { fontSize: 14, lineHeight: 20 },
 });

@@ -202,10 +202,6 @@ export default function DiscoverScreen() {
           />
 
           <View>
-            <Text style={styles.issue}>
-              ISSUE N° 04 ·
-            </Text>
-
             <Text style={styles.discoverTitle}>
               DISCOVER
             </Text>
@@ -272,15 +268,11 @@ export default function DiscoverScreen() {
       <View style={styles.dossier}>
         <View>
           <Text type="label" style={styles.dossierLabel}>
-            PORTFOLIO DOSSIER
+            PROFILES
           </Text>
         </View>
 
         <View style={styles.dossierRight}>
-          <Text style={styles.curatedText}>
-            curated for you
-          </Text>
-
           <Text style={styles.profileCount}>
             {String(currentIndex + 1).padStart(2, '0')} /{' '}
             {String(profiles.length).padStart(2, '0')}
@@ -468,15 +460,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
   },
 
-  issue: {
-    fontFamily: Typography.bodySans.fontFamily,
-    fontSize: 10,
-    lineHeight: 14,
-    fontWeight: '600',
-    letterSpacing: 1.45,
-    opacity: 0.48,
-  },
-
   discoverTitle: {
     fontFamily: Typography.bodySans.fontFamily,
     marginTop: 1,
@@ -538,14 +521,6 @@ const styles = StyleSheet.create({
 
   dossierRight: {
     alignItems: 'flex-end',
-  },
-
-  curatedText: {
-    fontFamily: Typography.body.fontFamily,
-    fontSize: 12,
-    lineHeight: 15,
-    fontStyle: 'italic',
-    opacity: 0.55,
   },
 
   profileCount: {

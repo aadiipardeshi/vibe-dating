@@ -176,10 +176,6 @@ export default function MatchScreen() {
                 {person.neighborhood.toUpperCase()} · {person.city.toUpperCase()}
               </Text>
             </View>
-
-            <Text style={styles.plate}>
-              PLATE 01 / 02
-            </Text>
           </View>
         </View>
 
@@ -351,10 +347,6 @@ export default function MatchScreen() {
             />
 
             <View style={styles.secondOverlay} />
-
-            <Text style={styles.secondCaption}>
-              PLATE 02 · PHOTOGRAPHY
-            </Text>
           </View>
 
           <View
@@ -461,27 +453,6 @@ export default function MatchScreen() {
         </Pressable>
       </View>
 
-      <View style={styles.footer}>
-        <View
-          style={[
-            styles.footerLine,
-            {
-              backgroundColor: theme.border,
-            },
-          ]}
-        />
-
-        <Text
-          style={[
-            styles.footerText,
-            {
-              color: theme.textTertiary,
-            },
-          ]}
-        >
-          VIBE · CONNECTION N° 01
-        </Text>
-      </View>
     </Screen>
   );
 }
@@ -694,16 +665,6 @@ const styles = StyleSheet.create({
     opacity: 0.88,
   },
 
-  plate: {
-    fontFamily: Typography.bodySans.fontFamily,
-    color: Colors.light.onAccent,
-    fontSize: 10,
-    lineHeight: 14,
-    fontWeight: '600',
-    letterSpacing: 1,
-    opacity: 0.76,
-  },
-
   cardBody: {
     padding: Spacing.four,
   },
@@ -838,18 +799,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.12)',
   },
 
-  secondCaption: {
-    fontFamily: Typography.bodySans.fontFamily,
-    position: 'absolute',
-    left: 14,
-    bottom: 13,
-    color: Colors.light.onAccent,
-    fontSize: 10,
-    lineHeight: 14,
-    fontWeight: '700',
-    letterSpacing: 1.1,
-  },
-
   friendQuote: {
     flexDirection: 'row',
     gap: Spacing.three,
@@ -919,24 +868,5 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  footer: {
-    alignItems: 'center',
-    paddingTop: Spacing.six,
-  },
-
-  footerLine: {
-    width: 42,
-    height: StyleSheet.hairlineWidth,
-    marginBottom: Spacing.three,
-  },
-
-  footerText: {
-    fontFamily: Typography.bodySans.fontFamily,
-    fontSize: 10,
-    lineHeight: 14,
-    fontWeight: '600',
-    letterSpacing: 1.3,
   },
 });

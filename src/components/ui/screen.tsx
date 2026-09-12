@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     minHeight: 0,
     width: '100%',
-    maxWidth: MaxContentWidth,
+    maxWidth: Platform.OS === 'web' ? MaxContentWidth : undefined,
     alignSelf: 'center',
     paddingHorizontal: Spacing.four,
     paddingVertical: Spacing.four,

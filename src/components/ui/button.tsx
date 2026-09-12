@@ -43,7 +43,7 @@ export function Button({ children, variant = 'primary', style, disabled, ...rest
       ]}
       {...rest}>
       {typeof children === 'string' ? (
-        <Text type="label" style={{ color: textColor, textAlign: 'center' }}>
+        <Text type="bodySans" style={{ color: textColor, textAlign: 'center', fontSize: 14, lineHeight: 20, fontWeight: '600' }}>
           {children}
         </Text>
       ) : (
