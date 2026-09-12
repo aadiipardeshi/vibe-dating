@@ -1,0 +1,17 @@
+export type {
+  Gender,
+  Interest,
+  Like,
+  Match,
+  MatchId,
+  MediaType,
+  Message,
+  Post,
+  Profile,
+  ProfileId,
+  ProfilePhoto,
+  RelationshipIntent,
+  User,
+  UserId,
+  Vibe,
+} from './models';
