@@ -39,6 +39,7 @@ export function Input({
       ) : null}
 
       <TextInput
+        accessibilityLabel={label}
         placeholderTextColor={theme.textTertiary}
         multiline={multiline}
         selectionColor={theme.accentMuted}

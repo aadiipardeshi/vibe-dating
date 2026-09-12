@@ -5,5 +5,9 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
   --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
   --font-serif: Iowan Old Style, Palatino, Georgia, 'Times New Roman', serif;
-  background-color: #f4ede4;
+  background-color: #F7F5EF;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root { background-color: #171513; }
 }

@@ -1,3 +1,7 @@
+import { Colors } from '@/constants/theme';
+import { usePrototypeStore } from '@/store/prototype';
+import { getPerson } from '@/data/prototype';
+import { Button } from '@/components/ui/button';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
@@ -16,21 +20,14 @@ import {
 } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
-const profilePic = require('@/assets/images/profilepic.jpg');
-const profilePic2 = require('@/assets/images/profilepic2.jpg');
-
-const tags = [
-  'Coastal Hikes',
-  'Filter Coffee',
-  '35mm Film',
-  'Scandinavian Design',
-  'Vinyl',
-];
-
 export default function MatchScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const theme = useTheme();
+  const { decisions, decide } = usePrototypeStore();
+  const person = getPerson(id);
+  if (!person) return <Screen><Text type="title">Connection not found</Text><Button onPress={() => router.replace('/matches')}>BACK TO CHATS</Button></Screen>;
+  const tags = person.tags;
 
   return (
     <Screen
@@ -40,7 +37,8 @@ export default function MatchScreen() {
       {/* TOP BAR */}
       <View style={styles.topBar}>
         <Pressable
-          onPress={() => router.back()}
+          accessibilityRole="button" accessibilityLabel="Go back" hitSlop={8}
+          onPress={() => router.canGoBack() ? router.back() : router.replace("/matches")}
           style={({ pressed }) => [
             styles.roundButton,
             {
@@ -65,6 +63,8 @@ export default function MatchScreen() {
         </View>
 
         <Pressable
+          onPress={() => decide(person.id, decisions[person.id] === "like" ? "pass" : "like")}
+          accessibilityRole="button" accessibilityLabel={decisions[person.id] === "like" ? "Remove like" : "Like this connection"}
           style={({ pressed }) => [
             styles.roundButton,
             {
@@ -74,7 +74,7 @@ export default function MatchScreen() {
           ]}
         >
           <Text style={styles.moreIcon}>
-            ···
+            {decisions[person.id] === "like" ? "♥" : "♡"}
           </Text>
         </Pressable>
       </View>
@@ -91,7 +91,7 @@ export default function MatchScreen() {
       {/* MATCH INTRO */}
       <View style={styles.matchIntro}>
         <Text type="label" style={styles.sectionLabel}>
-          MATCH {id?.toUpperCase() ?? 'PREVIEW'}
+          MATCH · {person.name.toUpperCase()}
         </Text>
 
         <Text style={styles.matchTitle}>
@@ -124,7 +124,7 @@ export default function MatchScreen() {
       >
         <View style={styles.hero}>
           <Image
-            source={profilePic}
+            source={person.photos[0]}
             style={styles.heroImage}
             contentFit="cover"
           />
@@ -143,13 +143,13 @@ export default function MatchScreen() {
               />
 
               <Text style={styles.heroPillText}>
-                EXPLORER · DUBLIN
+                {person.occupation.toUpperCase()} · {person.city.toUpperCase()}
               </Text>
             </View>
 
             <View style={styles.heroPill}>
               <Text style={styles.heroPillText}>
-                87% RESONANCE
+                {person.resonance}% RESONANCE
               </Text>
             </View>
           </View>
@@ -158,11 +158,11 @@ export default function MatchScreen() {
             <View>
               <View style={styles.nameRow}>
                 <Text style={styles.name}>
-                  Maya
+                  {person.name}
                 </Text>
 
                 <Text style={styles.age}>
-                  27
+                  {person.age}
                 </Text>
 
                 <View style={styles.verified}>
@@ -173,7 +173,7 @@ export default function MatchScreen() {
               </View>
 
               <Text style={styles.location}>
-                DUBLIN, IRELAND · ARCHITECT
+                {person.neighborhood.toUpperCase()} · {person.city.toUpperCase()}
               </Text>
             </View>
 
@@ -214,9 +214,7 @@ export default function MatchScreen() {
           </View>
 
           <Text style={styles.editorialCopy}>
-            You both instinctively gravitate toward
-            spontaneous weekend escapes over staying within
-            the city walls.
+            {person.note}
           </Text>
 
           <View
@@ -234,10 +232,7 @@ export default function MatchScreen() {
           </Text>
 
           <Text style={styles.bodyCopy}>
-            Architect by day, sea swimmer by weekend.
-            Seeking someone who finds quiet cadence in
-            overcast mornings, forgotten bookshops and
-            unscripted road journeys along the Atlantic edge.
+            {person.bio}
           </Text>
 
           <View
@@ -274,7 +269,7 @@ export default function MatchScreen() {
             </Text>
 
             <Text style={styles.question}>
-              What&apos;s your ideal way to spend a rainy day?
+              {person.funQuestion}
             </Text>
 
             <Text
@@ -285,7 +280,7 @@ export default function MatchScreen() {
                 },
               ]}
             >
-              Coffee, a good book, and a window with a view.
+              {person.funAnswer}
             </Text>
           </View>
 
@@ -344,13 +339,13 @@ export default function MatchScreen() {
                 },
               ]}
             >
-              VIEW ALL (2)
+              02 PHOTOGRAPHS
             </Text>
           </View>
 
           <View style={styles.secondPhoto}>
             <Image
-              source={profilePic2}
+              source={person.photos[1]}
               style={styles.secondPhotoImage}
               contentFit="cover"
             />
@@ -389,8 +384,7 @@ export default function MatchScreen() {
             </Text>
 
             <Text style={styles.friendQuoteText}>
-              The person who can turn a simple plan into an
-              unforgettable adventure.
+              {person.friendsThink}
             </Text>
           </View>
         </View>
@@ -419,7 +413,8 @@ export default function MatchScreen() {
         </Text>
 
         <Pressable
-          onPress={() => router.push('/chat/preview')}
+          accessibilityRole="button"
+          onPress={() => router.push({ pathname: '/chat/[id]', params: { id: person.id } })}
           style={({ pressed }) => [
             styles.messageButton,
             {
@@ -450,7 +445,8 @@ export default function MatchScreen() {
         </Pressable>
 
         <Pressable
-          onPress={() => router.back()}
+          accessibilityRole="button"
+          onPress={() => router.replace("/(tabs)")}
           style={({ pressed }) => [
             styles.secondaryButton,
             {
@@ -502,8 +498,8 @@ const styles = StyleSheet.create({
   },
 
   roundButton: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     borderRadius: Radius.full,
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
@@ -531,8 +527,9 @@ const styles = StyleSheet.create({
   },
 
   eyebrow: {
-    fontSize: 7,
-    lineHeight: 10,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.4,
     opacity: 0.45,
@@ -585,7 +582,7 @@ const styles = StyleSheet.create({
   },
 
   hero: {
-    height: 470,
+    aspectRatio: 0.85,
     position: 'relative',
   },
 
@@ -600,6 +597,7 @@ const styles = StyleSheet.create({
   },
 
   heroTop: {
+    flexWrap: 'wrap',
     position: 'absolute',
     top: 16,
     left: 16,
@@ -626,14 +624,16 @@ const styles = StyleSheet.create({
   },
 
   heroPillText: {
-    color: '#24211F',
-    fontSize: 7,
-    lineHeight: 10,
+    fontFamily: Typography.bodySans.fontFamily,
+    color: Colors.light.text,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1,
   },
 
   heroBottom: {
+    flexWrap: 'wrap',
     position: 'absolute',
     left: 18,
     right: 18,
@@ -651,7 +651,7 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    color: '#FFFFFF',
+    color: Colors.light.onAccent,
     fontFamily: Typography.display.fontFamily,
     fontSize: 39,
     lineHeight: 42,
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
   },
 
   age: {
-    color: '#FFFFFF',
+    color: Colors.light.onAccent,
     fontFamily: Typography.heading.fontFamily,
     fontSize: 20,
     lineHeight: 24,
@@ -676,26 +676,29 @@ const styles = StyleSheet.create({
   },
 
   verifiedText: {
-    color: '#24211F',
-    fontSize: 9,
-    lineHeight: 10,
+    fontFamily: Typography.bodySans.fontFamily,
+    color: Colors.light.text,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
   },
 
   location: {
+    fontFamily: Typography.bodySans.fontFamily,
     marginTop: 5,
-    color: '#FFFFFF',
-    fontSize: 8,
-    lineHeight: 11,
+    color: Colors.light.onAccent,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.3,
     opacity: 0.88,
   },
 
   plate: {
-    color: '#FFFFFF',
-    fontSize: 7,
-    lineHeight: 10,
+    fontFamily: Typography.bodySans.fontFamily,
+    color: Colors.light.onAccent,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '600',
     letterSpacing: 1,
     opacity: 0.76,
@@ -706,6 +709,7 @@ const styles = StyleSheet.create({
   },
 
   sectionHeader: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -795,26 +799,29 @@ const styles = StyleSheet.create({
   },
 
   tagText: {
+    fontFamily: Typography.bodySans.fontFamily,
     fontSize: 10,
-    lineHeight: 13,
+    lineHeight: 14,
     fontWeight: '500',
   },
 
   photoHeader: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
 
   viewAll: {
-    fontSize: 8,
-    lineHeight: 11,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1,
   },
 
   secondPhoto: {
-    height: 225,
+    aspectRatio: 1.4,
     marginTop: Spacing.three,
     borderRadius: Radius.lg,
     overflow: 'hidden',
@@ -832,12 +839,13 @@ const styles = StyleSheet.create({
   },
 
   secondCaption: {
+    fontFamily: Typography.bodySans.fontFamily,
     position: 'absolute',
     left: 14,
     bottom: 13,
-    color: '#FFFFFF',
-    fontSize: 8,
-    lineHeight: 11,
+    color: Colors.light.onAccent,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.1,
   },
@@ -925,8 +933,9 @@ const styles = StyleSheet.create({
   },
 
   footerText: {
-    fontSize: 7,
-    lineHeight: 10,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '600',
     letterSpacing: 1.3,
   },

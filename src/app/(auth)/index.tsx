@@ -1,3 +1,5 @@
+import { Image } from 'expo-image';
+import { accountPhoto } from '@/data/prototype';
 import { Link } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
@@ -7,12 +9,13 @@ import { Spacing } from '@/constants/theme';
 
 export default function WelcomeScreen() {
   return (
-    <Screen>
+    <Screen scroll>
+      <Image source={accountPhoto} style={{ width: "100%", aspectRatio: 1.3, borderRadius: 16 }} contentFit="cover" accessibilityLabel="VIBE editorial portrait" />
       <View style={styles.hero}>
         <Text type="caption" tone="accent">
-          {Brand.launchLine}
+          {Brand.launchLine.toUpperCase()} · PRIVATE EDITION
         </Text>
-        <Text type="display">{Brand.name}</Text>
+        <Text type="display">VIBE</Text>
         <Text type="title" tone="textSecondary" style={styles.tagline}>
           {Brand.tagline}
         </Text>
@@ -24,10 +27,10 @@ export default function WelcomeScreen() {
           dinners in Koregaon Park.
         </Text>
         <Link href="/(auth)/sign-up" asChild>
-          <Button>Create account</Button>
+          <Button>CREATE ACCOUNT</Button>
         </Link>
         <Link href="/(auth)/login" asChild>
-          <Button variant="secondary">Log in</Button>
+          <Button variant="secondary">LOG IN</Button>
         </Link>
       </View>
     </Screen>
@@ -36,7 +39,7 @@ export default function WelcomeScreen() {
 
 const styles = StyleSheet.create({
   hero: {
-    flex: 1,
+    paddingTop: Spacing.five,
     justifyContent: 'flex-end',
     gap: Spacing.two,
     paddingBottom: Spacing.five,

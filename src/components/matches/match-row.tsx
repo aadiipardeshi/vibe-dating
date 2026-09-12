@@ -11,28 +11,23 @@ import { useTheme } from '@/hooks/use-theme';
 type MatchRowProps = {
   name: string;
   preview: string;
+  photo?: number;
+  time?: string;
 };
 
 export function MatchRow({
   name,
   preview,
+  photo,
+  time,
 }: MatchRowProps) {
   const theme = useTheme();
 
   return (
     <View style={styles.row}>
       <View style={styles.avatarWrap}>
-        <Avatar name={name} />
+        <Avatar name={name} source={photo} />
 
-        <View
-          style={[
-            styles.onlineDot,
-            {
-              backgroundColor: theme.accentMuted,
-              borderColor: theme.surface,
-            },
-          ]}
-        />
       </View>
 
       <View style={styles.copy}>
@@ -49,7 +44,7 @@ export function MatchRow({
               },
             ]}
           >
-            8:42 PM
+            {time}
           </Text>
         </View>
 
@@ -66,14 +61,6 @@ export function MatchRow({
             {preview}
           </Text>
 
-          <View
-            style={[
-              styles.unreadDot,
-              {
-                backgroundColor: theme.accentMuted,
-              },
-            ]}
-          />
         </View>
       </View>
     </View>
@@ -92,16 +79,6 @@ const styles = StyleSheet.create({
 
   avatarWrap: {
     position: 'relative',
-  },
-
-  onlineDot: {
-    position: 'absolute',
-    right: 0,
-    bottom: 1,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 2,
   },
 
   copy: {
@@ -125,8 +102,9 @@ const styles = StyleSheet.create({
   },
 
   time: {
-    fontSize: 8,
-    lineHeight: 11,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '600',
     letterSpacing: 0.8,
   },
@@ -143,11 +121,5 @@ const styles = StyleSheet.create({
     fontFamily: Typography.bodySans.fontFamily,
     fontSize: 13,
     lineHeight: 18,
-  },
-
-  unreadDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
   },
 });

@@ -16,7 +16,7 @@ export const Colors = {
 
     // Main accents
     accent: '#35121F',
-    accentMuted: '#E9858D',
+    accentMuted: '#B97580',
     accentSoft: '#F6E9EA',
 
     // Supporting accents
@@ -40,7 +40,7 @@ export const Colors = {
     border: '#3B3631',
 
     accent: '#E8D7DD',
-    accentMuted: '#E9858D',
+    accentMuted: '#B97580',
     accentSoft: '#39242B',
 
     success: '#7FA68F',
@@ -167,7 +167,7 @@ export const Shadows = {
       width: 0,
       height: 8,
     },
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.035,
     shadowRadius: 18,
     elevation: 3,
   },
@@ -178,9 +178,9 @@ export const Shadows = {
       width: 0,
       height: 10,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.06,
     shadowRadius: 22,
-    elevation: 6,
+    elevation: 3,
   },
 } as const;
 

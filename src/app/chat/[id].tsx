@@ -1,5 +1,11 @@
+import { useEffect, useRef, useState } from 'react';
+import { getPerson, initialMessages } from '@/data/prototype';
+import { usePrototypeStore } from '@/store/prototype';
+import { Button } from '@/components/ui/button';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -22,13 +28,24 @@ export default function ChatScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const theme = useTheme();
+  const [draft, setDraft] = useState('');
+  useEffect(() => { setDraft(''); }, [id]);
+  const messages = usePrototypeStore((state) => state.messages);
+  const send = usePrototypeStore((state) => state.send);
+  const threadRef = useRef<ScrollView>(null);
+  const person = getPerson(id);
+  if (!person) return <Screen><Text type="title">Conversation not found</Text><Button onPress={() => router.replace('/matches')}>BACK TO CHATS</Button></Screen>;
+  const thread = [...initialMessages(person), ...(messages[person.id] ?? [])];
+  const sendDraft = () => { send(person.id, draft); setDraft(''); };
 
   return (
     <Screen contentStyle={styles.screen}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
       {/* HEADER */}
       <View style={styles.header}>
         <Pressable
-          onPress={() => router.back()}
+          accessibilityRole="button" accessibilityLabel="Go back" hitSlop={8}
+          onPress={() => router.canGoBack() ? router.back() : router.replace("/matches")}
           style={({ pressed }) => [
             styles.headerButton,
             {
@@ -42,14 +59,14 @@ export default function ChatScreen() {
 
         <View style={styles.headerIdentity}>
           <Avatar
-            name="Maya"
+            name={person.name} source={person.photos[0]}
             size={38}
           />
 
-          <View>
+          <View style={{ flex: 1 }}>
             <View style={styles.nameRow}>
               <Text style={styles.headerName}>
-                Maya
+                {person.name}
               </Text>
 
               <View
@@ -63,12 +80,14 @@ export default function ChatScreen() {
             </View>
 
             <Text style={styles.headerMeta}>
-              87% RESONANCE · ACTIVE NOW
+              {person.resonance}% RESONANCE · {person.city.toUpperCase()}
             </Text>
           </View>
         </View>
 
         <Pressable
+          onPress={() => router.push({ pathname: "/match/[id]", params: { id: person.id } })}
+          accessibilityRole="button" accessibilityLabel="View profile dossier"
           style={({ pressed }) => [
             styles.headerButton,
             {
@@ -78,7 +97,7 @@ export default function ChatScreen() {
           ]}
         >
           <Text style={styles.moreIcon}>
-            ···
+            ↗
           </Text>
         </Pressable>
       </View>
@@ -94,13 +113,16 @@ export default function ChatScreen() {
 
       {/* THREAD */}
       <ScrollView
+        ref={threadRef}
+        keyboardShouldPersistTaps="handled"
+        onContentSizeChange={() => threadRef.current?.scrollToEnd({ animated: true })}
         style={styles.thread}
         contentContainerStyle={styles.threadContent}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.threadIntro}>
           <Text type="label" style={styles.threadLabel}>
-            CONVERSATION {id?.toUpperCase() ?? 'PREVIEW'}
+            CONVERSATION · {person.name.toUpperCase()}
           </Text>
 
           <Text style={styles.threadTitle}>
@@ -115,151 +137,8 @@ export default function ChatScreen() {
               },
             ]}
           >
-            You matched because your profiles shared a
-            similar rhythm around travel, coffee and slow
-            weekends.
+            {person.note}
           </Text>
-        </View>
-
-        <View style={styles.dateRow}>
-          <View
-            style={[
-              styles.dateLine,
-              {
-                backgroundColor: theme.border,
-              },
-            ]}
-          />
-
-          <Text
-            style={[
-              styles.dateText,
-              {
-                color: theme.textTertiary,
-              },
-            ]}
-          >
-            TODAY
-          </Text>
-
-          <View
-            style={[
-              styles.dateLine,
-              {
-                backgroundColor: theme.border,
-              },
-            ]}
-          />
-        </View>
-
-        {/* RECEIVED */}
-        <View style={styles.receivedRow}>
-          <Avatar
-            name="Maya"
-            size={30}
-          />
-
-          <View style={styles.receivedContent}>
-            <View
-              style={[
-                styles.receivedBubble,
-                {
-                  backgroundColor: theme.backgroundElement,
-                  borderColor: theme.border,
-                },
-              ]}
-            >
-              <Text style={styles.messageText}>
-                You mentioned forgotten bookshops. I need to
-                know your current favourite.
-              </Text>
-            </View>
-
-            <Text
-              style={[
-                styles.timestamp,
-                {
-                  color: theme.textTertiary,
-                },
-              ]}
-            >
-              8:36 PM
-            </Text>
-          </View>
-        </View>
-
-        {/* SENT */}
-        <View style={styles.sentRow}>
-          <View style={styles.sentContent}>
-            <View
-              style={[
-                styles.sentBubble,
-                {
-                  backgroundColor: theme.accent,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.messageText,
-                  {
-                    color: theme.onAccent,
-                  },
-                ]}
-              >
-                There&apos;s a tiny one near the old market.
-                Mostly second-hand books, terrible signage,
-                excellent coffee next door.
-              </Text>
-            </View>
-
-            <Text
-              style={[
-                styles.sentTimestamp,
-                {
-                  color: theme.textTertiary,
-                },
-              ]}
-            >
-              8:39 PM · READ
-            </Text>
-          </View>
-        </View>
-
-        {/* RECEIVED */}
-        <View style={styles.receivedRow}>
-          <Avatar
-            name="Maya"
-            size={30}
-          />
-
-          <View style={styles.receivedContent}>
-            <View
-              style={[
-                styles.receivedBubble,
-                {
-                  backgroundColor: theme.backgroundElement,
-                  borderColor: theme.border,
-                },
-              ]}
-            >
-              <Text style={styles.messageText}>
-                That sounds suspiciously like my ideal
-                Saturday.
-              </Text>
-            </View>
-
-            <Text
-              style={[
-                styles.timestamp,
-                {
-                  color: theme.textTertiary,
-                },
-              ]}
-            >
-              8:42 PM
-            </Text>
-          </View>
         </View>
 
         {/* DATE PROMPT */}
@@ -300,11 +179,12 @@ export default function ChatScreen() {
               },
             ]}
           >
-            A coffee and bookshop wander feels unusually
-            on-theme.
+            {person.dateIdea}
           </Text>
 
           <Pressable
+            onPress={() => setDraft(person.dateIdea)}
+            accessibilityRole="button"
             style={({ pressed }) => [
               styles.promptButton,
               {
@@ -319,10 +199,54 @@ export default function ChatScreen() {
                 color: theme.onAccent,
               }}
             >
-              SUGGEST A DATE
+              DRAFT A DATE INVITATION
             </Text>
           </Pressable>
         </View>
+
+        <View style={styles.dateRow}>
+          <View
+            style={[
+              styles.dateLine,
+              {
+                backgroundColor: theme.border,
+              },
+            ]}
+          />
+
+          <Text
+            style={[
+              styles.dateText,
+              {
+                color: theme.textTertiary,
+              },
+            ]}
+          >
+            TODAY
+          </Text>
+
+          <View
+            style={[
+              styles.dateLine,
+              {
+                backgroundColor: theme.border,
+              },
+            ]}
+          />
+        </View>
+
+        {thread.map((message) => (
+          <View key={message.id} style={message.sent ? styles.sentRow : styles.receivedRow}>
+            {!message.sent && <Avatar name={person.name} source={person.photos[0]} size={30} />}
+            <View style={message.sent ? styles.sentContent : styles.receivedContent}>
+              <View style={[message.sent ? styles.sentBubble : styles.receivedBubble, { backgroundColor: message.sent ? theme.accent : theme.backgroundElement, borderColor: theme.border }]}>
+                <Text style={[styles.messageText, { color: message.sent ? theme.onAccent : theme.text }]}>{message.body}</Text>
+              </View>
+              <Text type="caption" tone="textTertiary" style={{ marginTop: 6 }}>{message.time}{message.sent ? ' · LOCAL' : ''}</Text>
+            </View>
+          </View>
+        ))}
+
       </ScrollView>
 
       {/* COMPOSER */}
@@ -338,16 +262,25 @@ export default function ChatScreen() {
         <View style={styles.composer}>
           <View style={styles.inputWrap}>
             <Input
+              value={draft}
+              onChangeText={setDraft}
+              accessibilityLabel="Message"
+              onSubmitEditing={sendDraft}
+              returnKeyType="send"
               placeholder="Write something unhurried"
             />
           </View>
 
           <Pressable
+            onPress={sendDraft}
+            disabled={!draft.trim()}
+            accessibilityRole="button"
+            accessibilityLabel="Send message"
             style={({ pressed }) => [
               styles.sendButton,
               {
                 backgroundColor: theme.accent,
-                opacity: pressed ? 0.78 : 1,
+                opacity: !draft.trim() ? 0.4 : pressed ? 0.78 : 1,
               },
             ]}
           >
@@ -364,6 +297,7 @@ export default function ChatScreen() {
           </Pressable>
         </View>
       </View>
+      </KeyboardAvoidingView>
     </Screen>
   );
 }
@@ -384,8 +318,8 @@ const styles = StyleSheet.create({
   },
 
   headerButton: {
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     borderRadius: Radius.full,
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
@@ -433,9 +367,10 @@ const styles = StyleSheet.create({
   },
 
   headerMeta: {
+    fontFamily: Typography.bodySans.fontFamily,
     marginTop: 2,
-    fontSize: 7,
-    lineHeight: 10,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1,
     opacity: 0.45,
@@ -496,8 +431,9 @@ const styles = StyleSheet.create({
   },
 
   dateText: {
-    fontSize: 7,
-    lineHeight: 10,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.4,
   },
@@ -509,7 +445,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: Spacing.two,
     marginBottom: Spacing.four,
-    paddingRight: 60,
+    paddingRight: Spacing.five,
   },
 
   receivedContent: {
@@ -520,7 +456,7 @@ const styles = StyleSheet.create({
   sentRow: {
     alignItems: 'flex-end',
     marginBottom: Spacing.four,
-    paddingLeft: 62,
+    paddingLeft: Spacing.five,
   },
 
   sentContent: {
@@ -543,27 +479,9 @@ const styles = StyleSheet.create({
   },
 
   messageText: {
-    fontFamily: Typography.body.fontFamily,
+    fontFamily: Typography.bodySans.fontFamily,
     fontSize: 16,
     lineHeight: 23,
-  },
-
-  timestamp: {
-    marginTop: 5,
-    marginLeft: 5,
-    fontSize: 7,
-    lineHeight: 10,
-    fontWeight: '600',
-    letterSpacing: 0.7,
-  },
-
-  sentTimestamp: {
-    marginTop: 5,
-    marginRight: 5,
-    fontSize: 7,
-    lineHeight: 10,
-    fontWeight: '600',
-    letterSpacing: 0.7,
   },
 
   /* PROMPT */
@@ -607,7 +525,7 @@ const styles = StyleSheet.create({
 
   promptButton: {
     alignSelf: 'flex-start',
-    minHeight: 40,
+    minHeight: 44,
     marginTop: Spacing.four,
     paddingHorizontal: Spacing.four,
     borderRadius: Radius.full,

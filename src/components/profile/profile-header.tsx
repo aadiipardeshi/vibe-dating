@@ -1,37 +1,23 @@
+import { Image } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
-
-import { Avatar } from '@/components/ui/avatar';
 import { Text } from '@/components/ui/text';
-import { Spacing } from '@/constants/theme';
+import { Radius, Spacing } from '@/constants/theme';
+import { accountPhoto } from '@/data/prototype';
 
-type ProfileHeaderProps = {
-  name: string;
-  neighborhood: string;
-  bio: string;
-};
-
-export function ProfileHeader({ name, neighborhood, bio }: ProfileHeaderProps) {
+type ProfileHeaderProps = { name: string; age?: string; neighborhood: string; bio: string };
+export function ProfileHeader({ name, age, neighborhood, bio }: ProfileHeaderProps) {
   return (
     <View style={styles.wrap}>
-      <Avatar name={name} size={88} />
-      <Text type="title">{name}</Text>
-      <Text type="caption" tone="textSecondary">
-        {neighborhood}
-      </Text>
-      <Text style={styles.bio} tone="textSecondary">
-        {bio}
-      </Text>
+      <Image source={accountPhoto} accessibilityLabel="Your profile photograph" style={styles.photo} contentFit="cover" />
+      <Text type="label" tone="textSecondary">THE PERSON BEHIND THE PROFILE</Text>
+      <Text type="display">{name}{age ? `, ${age}` : ''}</Text>
+      <Text type="label" tone="textSecondary">{neighborhood.toUpperCase()}</Text>
+      <Text style={styles.bio} tone="textSecondary">{bio}</Text>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  wrap: {
-    alignItems: 'center',
-    gap: Spacing.two,
-  },
-  bio: {
-    textAlign: 'center',
-    marginTop: Spacing.two,
-  },
+  wrap: { gap: Spacing.three },
+  photo: { width: '100%', aspectRatio: 1.1, borderRadius: Radius.lg, marginBottom: Spacing.three },
+  bio: { marginTop: Spacing.two },
 });

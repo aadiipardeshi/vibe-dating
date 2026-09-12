@@ -58,6 +58,10 @@ export default function TabsLayout() {
           md="chat_bubble_outline"
         />
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="profile">
+        <NativeTabs.Trigger.Label>PROFILE</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="person.crop.circle" md="account_circle" />
+      </NativeTabs.Trigger>
     </NativeTabs>
   );
 }

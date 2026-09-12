@@ -31,6 +31,7 @@ export function Button({ children, variant = 'primary', style, disabled, ...rest
     <Pressable
       accessibilityRole="button"
       disabled={disabled}
+      accessibilityState={{ disabled: Boolean(disabled) }}
       style={({ pressed }) => [
         styles.base,
         {
@@ -42,7 +43,7 @@ export function Button({ children, variant = 'primary', style, disabled, ...rest
       ]}
       {...rest}>
       {typeof children === 'string' ? (
-        <Text type="label" style={{ color: textColor }}>
+        <Text type="label" style={{ color: textColor, textAlign: 'center' }}>
           {children}
         </Text>
       ) : (
@@ -60,5 +61,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: Spacing.four,
+    paddingVertical: Spacing.three,
   },
 });

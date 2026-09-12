@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { MaxContentWidth, Spacing } from '@/constants/theme';
@@ -24,12 +24,14 @@ export function Screen({ children, scroll = false, style, contentStyle }: Screen
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }, style]}>
       {scroll ? (
+        <KeyboardAvoidingView style={styles.safe} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           {body}
         </ScrollView>
+        </KeyboardAvoidingView>
       ) : (
         body
       )}
@@ -47,6 +49,8 @@ const styles = StyleSheet.create({
   },
   inner: {
     flexGrow: 1,
+    flexShrink: 1,
+    minHeight: 0,
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',

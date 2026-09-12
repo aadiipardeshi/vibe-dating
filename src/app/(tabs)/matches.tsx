@@ -1,3 +1,5 @@
+import { people } from '@/data/prototype';
+import { usePrototypeStore } from '@/store/prototype';
 import { Link } from 'expo-router';
 import {
   Pressable,
@@ -16,6 +18,7 @@ import { useTheme } from '@/hooks/use-theme';
 
 export default function MatchesScreen() {
   const theme = useTheme();
+  const messages = usePrototypeStore((state) => state.messages);
 
   return (
     <Screen scroll>
@@ -110,149 +113,30 @@ export default function MatchesScreen() {
           </View>
         </View>
 
-        <Link href="/match/preview" asChild>
-          <Pressable
-            style={({ pressed }) => [
-              styles.card,
-              {
-                borderColor: theme.border,
-                backgroundColor: theme.surface,
-                opacity: pressed ? 0.72 : 1,
-              },
-            ]}
-          >
-            <View style={styles.cardTop}>
-              <View
-                style={[
-                  styles.avatar,
-                  {
-                    backgroundColor: theme.backgroundElement,
-                    borderColor: theme.border,
-                  },
-                ]}
-              >
-                <Text style={styles.avatarText}>
-                  M
-                </Text>
-              </View>
-
-              <View style={styles.cardIdentity}>
-                <View style={styles.nameRow}>
-                  <Text style={styles.name}>
-                    Maya
-                  </Text>
-
-                  <Text style={styles.age}>
-                    27
-                  </Text>
-                </View>
-
-                <Text style={styles.meta}>
-                  DUBLIN · 87% RESONANCE
-                </Text>
-              </View>
-
-              <Text style={styles.arrow}>
-                ↗
-              </Text>
-            </View>
-
-            <View
-              style={[
-                styles.innerDivider,
-                {
-                  backgroundColor: theme.border,
-                },
-              ]}
-            />
-
-            <Text style={styles.matchQuote}>
-              “The beginning of something worth being
-              curious about.”
-            </Text>
-
-            <View style={styles.matchFooter}>
-              <Text
-                style={[
-                  styles.matchFooterText,
-                  {
-                    color: theme.textSecondary,
-                  },
-                ]}
-              >
-                VIEW PROFILE DOSSIER
-              </Text>
-
-              <Text
-                style={[
-                  styles.matchFooterText,
-                  {
-                    color: theme.textSecondary,
-                  },
-                ]}
-              >
-                JUST NOW
-              </Text>
-            </View>
-          </Pressable>
-        </Link>
+        {people.map((person) => (
+          <Link key={person.id} href={{ pathname: '/match/[id]', params: { id: person.id } }} asChild>
+            <Pressable accessibilityRole="button" accessibilityLabel={`View ${person.name}'s dossier`}
+              style={({ pressed }) => [styles.card, { marginBottom: Spacing.three, borderColor: theme.border, backgroundColor: theme.surface, opacity: pressed ? 0.72 : 1 }]}>
+              <MatchRow name={person.name} preview={`${person.city} · ${person.resonance}% resonance`} photo={person.photos[0]} time="NEW MATCH" />
+              <Text style={styles.matchQuote}>{person.note}</Text>
+              <Text type="label" style={{ marginTop: Spacing.three }}>VIEW DOSSIER →</Text>
+            </Pressable>
+          </Link>
+        ))}
       </View>
-
-      {/* CONVERSATIONS */}
       <View style={styles.section}>
-        <Text type="label" style={styles.sectionLabel}>
-          CONVERSATIONS
-        </Text>
-
-        <View
-          style={[
-            styles.conversationList,
-            {
-              borderColor: theme.border,
-              backgroundColor: theme.surface,
-            },
-          ]}
-        >
-          <Link href="/chat/preview" asChild>
-            <Pressable
-              style={({ pressed }) => [
-                styles.conversationPressable,
-                {
-                  opacity: pressed ? 0.65 : 1,
-                },
-              ]}
-            >
-              <MatchRow
-                name="Maya"
-                preview="That little bookshop sounds exactly like my kind of Sunday."
-              />
-            </Pressable>
-          </Link>
-
-          <View
-            style={[
-              styles.rowDivider,
-              {
-                backgroundColor: theme.border,
-              },
-            ]}
-          />
-
-          <Link href="/chat/preview" asChild>
-            <Pressable
-              style={({ pressed }) => [
-                styles.conversationPressable,
-                {
-                  opacity: pressed ? 0.65 : 1,
-                },
-              ]}
-            >
-              <MatchRow
-                name="Anika"
-                preview="Coffee first, then we can decide where the afternoon goes."
-              />
-            </Pressable>
-          </Link>
+        <Text type="label" style={styles.sectionLabel}>CONVERSATIONS</Text>
+        <View style={[styles.conversationList, { borderColor: theme.border, backgroundColor: theme.surface }]}>
+          {people.map((person) => {
+            const last = messages[person.id]?.at(-1);
+            return (
+              <Link key={person.id} href={{ pathname: '/chat/[id]', params: { id: person.id } }} asChild>
+                <Pressable accessibilityRole="button" accessibilityLabel={`Chat with ${person.name}`} style={({ pressed }) => [styles.conversationPressable, { opacity: pressed ? 0.65 : 1 }]}>
+                  <MatchRow name={person.name} photo={person.photos[0]} preview={last ? `You: ${last.body}` : person.preview} time={last?.time ?? '8:42 PM'} />
+                </Pressable>
+              </Link>
+            );
+          })}
         </View>
       </View>
 
@@ -291,9 +175,10 @@ const styles = StyleSheet.create({
   },
 
   eyebrow: {
+    fontFamily: Typography.bodySans.fontFamily,
     marginBottom: 4,
-    fontSize: 9,
-    lineHeight: 12,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.8,
     opacity: 0.5,
@@ -318,8 +203,9 @@ const styles = StyleSheet.create({
   },
 
   countText: {
-    fontSize: 9,
-    lineHeight: 12,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1,
   },
@@ -370,8 +256,9 @@ const styles = StyleSheet.create({
   },
 
   newText: {
-    fontSize: 8,
-    lineHeight: 11,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.2,
   },
@@ -382,90 +269,11 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
   },
 
-  cardTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: Radius.full,
-    borderWidth: StyleSheet.hairlineWidth,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  avatarText: {
-    fontFamily: Typography.heading.fontFamily,
-    fontSize: 21,
-    lineHeight: 24,
-  },
-
-  cardIdentity: {
-    flex: 1,
-    marginLeft: Spacing.three,
-  },
-
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 6,
-  },
-
-  name: {
-    fontFamily: Typography.heading.fontFamily,
-    fontSize: 23,
-    lineHeight: 27,
-  },
-
-  age: {
-    fontFamily: Typography.body.fontFamily,
-    fontSize: 15,
-    lineHeight: 20,
-    opacity: 0.55,
-  },
-
-  meta: {
-    marginTop: 3,
-    fontSize: 8,
-    lineHeight: 11,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    opacity: 0.45,
-  },
-
-  arrow: {
-    fontSize: 17,
-    lineHeight: 20,
-    opacity: 0.42,
-  },
-
-  innerDivider: {
-    width: '100%',
-    height: StyleSheet.hairlineWidth,
-    marginVertical: Spacing.four,
-  },
-
   matchQuote: {
     fontFamily: Typography.body.fontFamily,
     fontSize: 18,
     lineHeight: 27,
     fontStyle: 'italic',
-  },
-
-  matchFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: Spacing.four,
-    gap: 12,
-  },
-
-  matchFooterText: {
-    fontSize: 8,
-    lineHeight: 11,
-    fontWeight: '600',
-    letterSpacing: 1.1,
   },
 
   conversationList: {
@@ -477,11 +285,6 @@ const styles = StyleSheet.create({
 
   conversationPressable: {
     paddingHorizontal: Spacing.two,
-  },
-
-  rowDivider: {
-    height: StyleSheet.hairlineWidth,
-    marginHorizontal: Spacing.four,
   },
 
   footnote: {
@@ -496,10 +299,11 @@ const styles = StyleSheet.create({
   },
 
   footnoteText: {
+    fontFamily: Typography.bodySans.fontFamily,
     maxWidth: 240,
     textAlign: 'center',
-    fontSize: 8,
-    lineHeight: 13,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '600',
     letterSpacing: 1.35,
   },

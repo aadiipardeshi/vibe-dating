@@ -1,3 +1,4 @@
+import { usePrototypeStore } from '@/store/prototype';
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -9,15 +10,17 @@ import { useSessionStore } from '@/store/session';
 export default function LoginScreen() {
   const signIn = useSessionStore((state) => state.signIn);
   const [email, setEmail] = useState('');
+  const updateProfile = usePrototypeStore((state) => state.updateProfile);
+  const [error, setError] = useState('');
 
   return (
     <Screen scroll>
       <View style={styles.header}>
         <Text type="caption" tone="accent">
-          Welcome back
+          VIBE · WELCOME BACK
         </Text>
         <Text type="display">Log in</Text>
-        <Text tone="textSecondary">Supabase auth will replace this local session later.</Text>
+        <Text tone="textSecondary">Your next chapter starts with a conversation.</Text>
       </View>
 
       <View style={styles.form}>
@@ -29,23 +32,27 @@ export default function LoginScreen() {
           onChangeText={setEmail}
           placeholder="you@email.com"
         />
-        <Input label="Password" secureTextEntry placeholder="Your password" />
+        <Text type="bodySans" tone="textSecondary">Local preview · Enter an email to explore. No password required.</Text>
+        {error ? <Text type="bodySans" tone="accent" accessibilityLiveRegion="polite">{error}</Text> : null}
         <Button
           onPress={() => {
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError('Please enter a valid email.'); return; }
+            updateProfile({ name: email.trim().split('@')[0] });
             signIn({
               id: 'local-user',
-              email: email || null,
+              email: email.trim(),
               phone: null,
               createdAt: new Date().toISOString(),
               lastSeenAt: new Date().toISOString(),
             });
             router.replace('/(tabs)');
           }}>
-          Continue
+          CONTINUE
         </Button>
         <Link href="/(auth)/sign-up" asChild>
           <Button variant="ghost">Need an account?</Button>
         </Link>
+        <Link href="/(auth)" asChild><Button variant="ghost">BACK TO WELCOME</Button></Link>
       </View>
     </Screen>
   );
@@ -53,8 +60,9 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    gap: Spacing.two,
-    marginBottom: Spacing.five,
+    gap: Spacing.three,
+    paddingTop: Spacing.seven,
+    marginBottom: Spacing.six,
   },
   form: {
     gap: Spacing.three,

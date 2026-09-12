@@ -1,7 +1,13 @@
+import { Colors } from '@/constants/theme';
+import { people, accountPhoto } from '@/data/prototype';
+import { usePrototypeStore } from '@/store/prototype';
+import { Avatar, Button } from '@/components/ui';
+import { EditorialModal } from '@/components/ui/editorial-modal';
+import { router } from 'expo-router';
 import { useRef, useState } from 'react';
 import {
   Animated,
-  Dimensions,
+  useWindowDimensions,
   PanResponder,
   Pressable,
   StyleSheet,
@@ -18,43 +24,18 @@ import {
 } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
-const { width } = Dimensions.get('window');
-
-const SWIPE_THRESHOLD = 120;
-const SWIPE_OUT_DISTANCE = width * 1.4;
-
-const profilePic = require('@/assets/images/profilepic.jpg');
-const profilePic2 = require('@/assets/images/profilepic2.jpg');
-
-const profiles = [
-  {
-    id: '1',
-    name: 'Aadi',
-    age: 24,
-    neighborhood: 'Koregaon Park',
-    bio: 'Coffee, good conversations, discovering new places, and making plans that turn into great stories.',
-    photos: [profilePic, profilePic2],
-    funQuestion: 'My most controversial opinion is...',
-    funAnswer: 'The best conversations happen after midnight.',
-    friendsThink:
-      'The person who can convince everyone to leave the house for a spontaneous adventure.',
-  },
-  {
-    id: '2',
-    name: 'Vibe Profile',
-    age: 25,
-    neighborhood: 'Pune',
-    bio: 'Music, food, photography, and finding hidden spots around the city.',
-    photos: [profilePic2, profilePic],
-    funQuestion: 'A perfect Sunday looks like...',
-    funAnswer: 'Good food, great music, and absolutely no plans.',
-    friendsThink:
-      'Always knows the best place to eat and somehow turns every plan into an adventure.',
-  },
-];
+const SWIPE_THRESHOLD = 100;
 
 export default function DiscoverScreen() {
   const theme = useTheme();
+  const { width } = useWindowDimensions();
+  const [cardHeight, setCardHeight] = useState(420);
+  const [surface, setSurface] = useState<'filters' | 'notifications' | 'resonance' | null>(null);
+  const [highResonance, setHighResonance] = useState(false);
+  const { decide, decisions, notificationsEnabled, profile: account } = usePrototypeStore();
+  const profiles = highResonance ? people.filter((person) => person.resonance >= 90) : people;
+  const animating = useRef(false);
+  const [busy, setBusy] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const position = useRef(new Animated.ValueXY()).current;
@@ -72,10 +53,13 @@ export default function DiscoverScreen() {
   };
 
   const swipe = (direction: 'left' | 'right') => {
+    if (animating.current || !currentProfile) return;
+    animating.current = true;
+    setBusy(true);
     const destination =
       direction === 'right'
-        ? SWIPE_OUT_DISTANCE
-        : -SWIPE_OUT_DISTANCE;
+        ? width * 1.4
+        : -width * 1.4;
 
     Animated.timing(position, {
       toValue: {
@@ -84,13 +68,17 @@ export default function DiscoverScreen() {
       },
       duration: 250,
       useNativeDriver: true,
-    }).start(() => {
-      moveToNextProfile();
+    }).start(({ finished }) => {
+      if (finished) {
+        decide(currentProfile.id, direction === 'right' ? 'like' : 'pass');
+        moveToNextProfile();
+      }
+      animating.current = false;
+      setBusy(false);
     });
   };
 
-  const panResponder = useRef(
-    PanResponder.create({
+  const panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => false,
 
       onMoveShouldSetPanResponder: (_, gesture) => {
@@ -98,12 +86,13 @@ export default function DiscoverScreen() {
         const verticalMovement = Math.abs(gesture.dy);
 
         return (
-          horizontalMovement > verticalMovement &&
+          !animating.current && horizontalMovement > verticalMovement &&
           horizontalMovement > 8
         );
       },
 
       onPanResponderMove: (_, gesture) => {
+        if (animating.current) return;
         position.setValue({
           x: gesture.dx,
           y: 0,
@@ -129,6 +118,7 @@ export default function DiscoverScreen() {
       },
 
       onPanResponderTerminate: () => {
+        if (animating.current) return;
         Animated.spring(position, {
           toValue: {
             x: 0,
@@ -137,8 +127,7 @@ export default function DiscoverScreen() {
           useNativeDriver: true,
         }).start();
       },
-    }),
-  ).current;
+    });
 
   const rotate = position.x.interpolate({
     inputRange: [-width, 0, width],
@@ -155,6 +144,7 @@ export default function DiscoverScreen() {
     return (
       <Screen contentStyle={styles.screen}>
         <View style={styles.empty}>
+          <Button variant="ghost" onPress={() => router.push('/profile')}>YOUR PROFILE</Button>
           <Text type="label" style={styles.emptyEyebrow}>
             PORTFOLIO COMPLETE
           </Text>
@@ -172,7 +162,8 @@ export default function DiscoverScreen() {
           </Text>
 
           <Pressable
-            onPress={() => setCurrentIndex(0)}
+            accessibilityRole="button"
+            onPress={() => { setCurrentIndex(0); setHighResonance(false); }}
             style={[
               styles.restartButton,
               {
@@ -223,6 +214,9 @@ export default function DiscoverScreen() {
 
         <View style={styles.headerActions}>
           <Pressable
+            disabled={busy}
+            onPress={() => setSurface("filters")}
+            accessibilityRole="button" accessibilityLabel="Discovery filters" hitSlop={8}
             style={[
               styles.smallHeaderButton,
               {
@@ -236,6 +230,8 @@ export default function DiscoverScreen() {
           </Pressable>
 
           <Pressable
+            onPress={() => setSurface("notifications")}
+            accessibilityRole="button" accessibilityLabel="Activity notices" hitSlop={8}
             style={[
               styles.smallHeaderButton,
               {
@@ -249,6 +245,9 @@ export default function DiscoverScreen() {
           </Pressable>
 
           <Pressable
+            onPress={() => router.push('/profile')}
+            accessibilityRole="button"
+            accessibilityLabel="Open profile"
             style={[
               styles.profileCircle,
               {
@@ -257,9 +256,7 @@ export default function DiscoverScreen() {
               },
             ]}
           >
-            <Text style={styles.profileCircleText}>
-              V
-            </Text>
+            <Avatar name={account.name} source={accountPhoto} size={38} />
           </Pressable>
         </View>
       </View>
@@ -292,10 +289,15 @@ export default function DiscoverScreen() {
       </View>
 
       {/* CARD STACK */}
-      <View style={styles.cardArea}>
+      <View style={styles.cardArea} onLayout={(event) => setCardHeight(Math.max(1, event.nativeEvent.layout.height))}>
         {nextProfile && (
-          <View style={styles.nextCard}>
+          <View style={styles.nextCard} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
             <DiscoverCard
+              height={cardHeight}
+              city={nextProfile.city}
+              resonance={nextProfile.resonance}
+              note={nextProfile.note}
+              tags={nextProfile.tags}
               name={nextProfile.name}
               age={nextProfile.age}
               neighborhood={nextProfile.neighborhood}
@@ -322,6 +324,12 @@ export default function DiscoverScreen() {
           ]}
         >
           <DiscoverCard
+            key={currentProfile.id}
+            height={cardHeight}
+            city={currentProfile.city}
+            resonance={currentProfile.resonance}
+            note={currentProfile.note}
+            tags={currentProfile.tags}
             name={currentProfile.name}
             age={currentProfile.age}
             neighborhood={currentProfile.neighborhood}
@@ -347,6 +355,7 @@ export default function DiscoverScreen() {
       >
         <Pressable
           onPress={() => swipe('left')}
+          disabled={busy} accessibilityRole="button" accessibilityLabel="Pass on this profile"
           style={({ pressed }) => [
             styles.actionButton,
             styles.passButton,
@@ -363,6 +372,9 @@ export default function DiscoverScreen() {
         </Pressable>
 
         <Pressable
+          disabled={busy}
+          onPress={() => setSurface("resonance")}
+          accessibilityRole="button" accessibilityLabel="View resonance details"
           style={({ pressed }) => [
             styles.actionButton,
             styles.discoveryButton,
@@ -379,6 +391,7 @@ export default function DiscoverScreen() {
 
         <Pressable
           onPress={() => swipe('right')}
+          disabled={busy} accessibilityRole="button" accessibilityLabel="Like this profile"
           style={({ pressed }) => [
             styles.actionButton,
             styles.likeButton,
@@ -398,6 +411,22 @@ export default function DiscoverScreen() {
           </Text>
         </Pressable>
       </View>
+      <EditorialModal visible={surface !== null} title={surface === 'filters' ? 'Your discovery preferences' : surface === 'notifications' ? 'A little activity' : 'A shared rhythm'} onClose={() => setSurface(null)}>
+        {surface === 'filters' ? <>
+          <Text>Curate the local selection by shared resonance.</Text>
+          <Button variant={highResonance ? 'secondary' : 'primary'} onPress={() => { setHighResonance(false); setCurrentIndex(0); resetCard(); }}>ALL PROFILES</Button>
+          <Button variant={highResonance ? 'primary' : 'secondary'} onPress={() => { setHighResonance(true); setCurrentIndex(0); resetCard(); }}>90% RESONANCE & ABOVE</Button>
+          <Text type="bodySans" tone="textSecondary">{highResonance ? '1 profile' : '2 profiles'} in this local selection.</Text>
+        </> : surface === 'notifications' ? <>
+          <Text>{notificationsEnabled ? `Two conversations are waiting. You have liked ${Object.values(decisions).filter((value) => value === 'like').length} profiles this session.` : 'Activity notices are turned off in your profile preferences.'}</Text>
+          <Button onPress={() => { setSurface(null); router.push('/matches'); }}>OPEN CHATS</Button>
+        </> : <>
+          <Text type="heading">{currentProfile.resonance}% resonance with {currentProfile.name}</Text>
+          <Text>{currentProfile.note}</Text>
+          <Text type="bodySans" tone="textSecondary">Illustrative compatibility for this local preview.</Text>
+          <Button onPress={() => { setSurface(null); router.push({ pathname: '/match/[id]', params: { id: currentProfile.id } }); }}>VIEW DOSSIER</Button>
+        </>}
+      </EditorialModal>
     </Screen>
   );
 }
@@ -416,6 +445,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     minHeight: 54,
+    flexWrap: 'wrap',
+    gap: Spacing.two,
   },
 
   brandBlock: {
@@ -438,14 +469,16 @@ const styles = StyleSheet.create({
   },
 
   issue: {
-    fontSize: 8,
-    lineHeight: 11,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '600',
     letterSpacing: 1.45,
     opacity: 0.48,
   },
 
   discoverTitle: {
+    fontFamily: Typography.bodySans.fontFamily,
     marginTop: 1,
     fontSize: 11,
     lineHeight: 14,
@@ -460,8 +493,8 @@ const styles = StyleSheet.create({
   },
 
   smallHeaderButton: {
-    width: 31,
-    height: 31,
+    width: 44,
+    height: 44,
     borderRadius: Radius.full,
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
@@ -475,19 +508,12 @@ const styles = StyleSheet.create({
   },
 
   profileCircle: {
-    width: 33,
-    height: 33,
+    width: 44,
+    height: 44,
     borderRadius: Radius.full,
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  profileCircleText: {
-    fontFamily: Typography.heading.fontFamily,
-    fontSize: 14,
-    lineHeight: 17,
-    fontWeight: '600',
   },
 
   headerRule: {
@@ -523,9 +549,10 @@ const styles = StyleSheet.create({
   },
 
   profileCount: {
+    fontFamily: Typography.bodySans.fontFamily,
     marginTop: 2,
-    fontSize: 9,
-    lineHeight: 12,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '600',
     letterSpacing: 1.2,
     opacity: 0.5,
@@ -535,6 +562,8 @@ const styles = StyleSheet.create({
 
   cardArea: {
     flex: 1,
+    minHeight: 0,
+    overflow: 'hidden',
     position: 'relative',
     justifyContent: 'flex-start',
   },
@@ -602,7 +631,7 @@ const styles = StyleSheet.create({
   discoveryIcon: {
     fontSize: 19,
     lineHeight: 22,
-    color: '#E9858D',
+    color: Colors.light.accentMuted,
   },
 
   likeIcon: {

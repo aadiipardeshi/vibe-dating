@@ -1,3 +1,8 @@
+import { Colors } from '@/constants/theme';
+import { useState } from 'react';
+import { EditorialModal } from '@/components/ui/editorial-modal';
+import { Button } from '@/components/ui/button';
+import { people } from '@/data/prototype';
 import { Image, StyleSheet, View } from 'react-native';
 
 import { Screen, Text } from '@/components/ui';
@@ -8,11 +13,12 @@ import {
 } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
-const profilePic = require('@/assets/images/profilepic.jpg');
-const profilePic2 = require('@/assets/images/profilepic2.jpg');
+const profilePic = people[0].photos[0];
+const profilePic2 = people[0].photos[1];
 
 export default function ExploreScreen() {
   const theme = useTheme();
+  const [story, setStory] = useState<1 | 2 | null>(null);
 
   return (
     <Screen scroll>
@@ -82,6 +88,8 @@ export default function ExploreScreen() {
         </View>
       </View>
 
+      <Button variant="ghost" style={{ marginTop: Spacing.three }} onPress={() => setStory(1)}>READ THE CITY NOTE →</Button>
+
       {/* EDITORIAL NOTE */}
       <View style={styles.editorialSection}>
         <Text type="label" style={styles.sectionLabel}>
@@ -124,6 +132,8 @@ export default function ExploreScreen() {
         </View>
       </View>
 
+      <Button variant="ghost" style={{ marginBottom: Spacing.five }} onPress={() => setStory(2)}>READ THE WEEKEND DISPATCH →</Button>
+
       {/* SMALL FEATURE ROW */}
       <View style={styles.smallFeature}>
         <View style={styles.smallFeatureNumber}>
@@ -165,6 +175,11 @@ export default function ExploreScreen() {
           </View>
         </View>
       </View>
+      <EditorialModal visible={story !== null} title={story === 1 ? 'Nowhere urgent to be.' : 'The scenic route.'} onClose={() => setStory(null)}>
+        <Image source={story === 1 ? profilePic : profilePic2} style={{ width: '100%', aspectRatio: 1.2, borderRadius: Radius.md }} accessibilityLabel="Journal photograph" />
+        <Text type="label" tone="textSecondary">{story === 1 ? 'CITY NOTE · PUNE' : 'WEEKEND DISPATCH · MULSHI'}</Text>
+        <Text>{story === 1 ? 'Start with a coffee. Leave the phone in your pocket. Walk the streets you usually hurry through and notice the bookshop, the courtyard, the light on an old doorway. Some evenings need no more of a plan than that.' : 'An early start, a favourite playlist and the road toward Mulshi. Make time for breakfast, stop when the view asks you to, and let the afternoon unfold. The best part is often the detour.'}</Text>
+      </EditorialModal>
     </Screen>
   );
 }
@@ -178,8 +193,9 @@ const styles = StyleSheet.create({
   },
 
   eyebrow: {
-    fontSize: 9,
-    lineHeight: 12,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.8,
     opacity: 0.5,
@@ -195,8 +211,9 @@ const styles = StyleSheet.create({
   },
 
   issue: {
-    fontSize: 8,
-    lineHeight: 11,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '600',
     letterSpacing: 1.4,
     opacity: 0.48,
@@ -226,7 +243,7 @@ const styles = StyleSheet.create({
   },
 
   feature: {
-    height: 430,
+    aspectRatio: 0.9,
     borderRadius: Radius.xl,
     overflow: 'hidden',
     position: 'relative',
@@ -256,11 +273,12 @@ const styles = StyleSheet.create({
   },
 
   pillText: {
-    fontSize: 8,
-    lineHeight: 11,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.2,
-    color: '#24211F',
+    color: Colors.light.text,
   },
 
   featureBottom: {
@@ -271,9 +289,10 @@ const styles = StyleSheet.create({
   },
 
   featureKicker: {
-    color: '#FFFFFF',
-    fontSize: 9,
-    lineHeight: 12,
+    fontFamily: Typography.bodySans.fontFamily,
+    color: Colors.light.onAccent,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.6,
     opacity: 0.9,
@@ -281,7 +300,7 @@ const styles = StyleSheet.create({
 
   featureTitle: {
     marginTop: 7,
-    color: '#FFFFFF',
+    color: Colors.light.onAccent,
     fontFamily: Typography.display.fontFamily,
     fontSize: 31,
     lineHeight: 35,
@@ -307,7 +326,7 @@ const styles = StyleSheet.create({
 
   storyImage: {
     width: '100%',
-    height: 250,
+    aspectRatio: 1.5,
     borderRadius: Radius.lg,
   },
 
@@ -316,8 +335,9 @@ const styles = StyleSheet.create({
   },
 
   storyMeta: {
-    fontSize: 8,
-    lineHeight: 11,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.4,
     opacity: 0.48,
@@ -381,8 +401,9 @@ const styles = StyleSheet.create({
   },
 
   tagText: {
+    fontFamily: Typography.bodySans.fontFamily,
     fontSize: 10,
-    lineHeight: 13,
+    lineHeight: 14,
     fontWeight: '500',
   },
 });

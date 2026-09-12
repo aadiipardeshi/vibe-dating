@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/theme';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Card } from '@/components/ui/card';
@@ -11,6 +12,11 @@ import {
 import { useTheme } from '@/hooks/use-theme';
 
 type DiscoverCardProps = {
+  height?: number;
+  city: string;
+  resonance: number;
+  note: string;
+  tags: string[];
   name: string;
   age: number;
   neighborhood: string;
@@ -22,6 +28,11 @@ type DiscoverCardProps = {
 };
 
 export function DiscoverCard({
+  height,
+  city,
+  resonance,
+  note,
+  tags,
   name,
   age,
   neighborhood,
@@ -38,6 +49,7 @@ export function DiscoverCard({
       elevated
       style={[
         styles.card,
+        { height },
         {
           backgroundColor: theme.surface,
           borderColor: theme.border,
@@ -65,7 +77,7 @@ export function DiscoverCard({
           <View style={styles.heroTopRow}>
             <View style={styles.heroPill}>
               <Text style={styles.heroPillText}>
-                EXPLORER · DUBLIN
+                EXPLORER · {city.toUpperCase()}
               </Text>
             </View>
 
@@ -73,7 +85,7 @@ export function DiscoverCard({
               <View style={styles.pinkDot} />
 
               <Text style={styles.heroPillText}>
-                87% RESONANCE
+                {resonance}% RESONANCE
               </Text>
             </View>
           </View>
@@ -87,7 +99,7 @@ export function DiscoverCard({
               </Text>
 
               <Text style={styles.heroLocation}>
-                {neighborhood.toUpperCase()} · PUNE
+                {neighborhood.toUpperCase()} · {city.toUpperCase()}
               </Text>
             </View>
 
@@ -122,8 +134,7 @@ export function DiscoverCard({
           </View>
 
           <Text style={styles.resonanceQuote}>
-            “You both instinctively gravitate toward spontaneous weekend
-            escapes over staying within the city walls.”
+            “{note}”
           </Text>
         </View>
 
@@ -177,13 +188,7 @@ export function DiscoverCard({
           </Text>
 
           <View style={styles.tags}>
-            {[
-              'Coastal Hikes',
-              'Filter Coffee',
-              '35mm Film',
-              'Scandinavian Design',
-              'Vinyl',
-            ].map((tag) => (
+            {tags.map((tag) => (
               <View
                 key={tag}
                 style={[
@@ -211,7 +216,7 @@ export function DiscoverCard({
               </Text>
 
               <Text style={styles.viewAll}>
-                VIEW ALL (2)
+                02 PHOTOGRAPHS
               </Text>
             </View>
 
@@ -250,7 +255,6 @@ const styles = StyleSheet.create({
   card: {
     padding: 0,
     overflow: 'hidden',
-    maxHeight: 640,
     borderRadius: Radius.xl,
     ...Shadows.subtle,
   },
@@ -262,7 +266,7 @@ const styles = StyleSheet.create({
   /* HERO */
 
   hero: {
-    height: 390,
+    aspectRatio: 0.9,
     position: 'relative',
     overflow: 'hidden',
   },
@@ -278,6 +282,7 @@ const styles = StyleSheet.create({
   },
 
   heroTopRow: {
+    flexWrap: 'wrap',
     position: 'absolute',
     top: 16,
     left: 16,
@@ -299,21 +304,23 @@ const styles = StyleSheet.create({
   },
 
   heroPillText: {
-    fontSize: 9,
-    lineHeight: 12,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.1,
-    color: '#24211F',
+    color: Colors.light.text,
   },
 
   pinkDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#E9858D',
+    backgroundColor: Colors.light.accentMuted,
   },
 
   heroBottom: {
+    flexWrap: 'wrap',
     position: 'absolute',
     left: 18,
     right: 18,
@@ -334,7 +341,7 @@ const styles = StyleSheet.create({
     lineHeight: 42,
     fontWeight: '400',
     letterSpacing: -1.1,
-    color: '#FFFFFF',
+    color: Colors.light.onAccent,
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: {
       width: 0,
@@ -348,24 +355,26 @@ const styles = StyleSheet.create({
     fontSize: 25,
     lineHeight: 30,
     fontWeight: '400',
-    color: '#FFFFFF',
+    color: Colors.light.onAccent,
   },
 
   heroLocation: {
+    fontFamily: Typography.bodySans.fontFamily,
     marginTop: 4,
-    fontSize: 9,
-    lineHeight: 13,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.5,
-    color: '#FFFFFF',
+    color: Colors.light.onAccent,
     opacity: 0.92,
   },
 
   plateText: {
-    fontSize: 8,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1.4,
-    color: '#FFFFFF',
+    color: Colors.light.onAccent,
     opacity: 0.9,
   },
 
@@ -381,6 +390,7 @@ const styles = StyleSheet.create({
   },
 
   resonanceHeadingRow: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -396,8 +406,9 @@ const styles = StyleSheet.create({
   },
 
   smallLabel: {
-    fontSize: 9,
-    lineHeight: 12,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
   },
 
   concordanceText: {
@@ -480,6 +491,7 @@ const styles = StyleSheet.create({
   },
 
   tagText: {
+    fontFamily: Typography.bodySans.fontFamily,
     fontSize: 11,
     lineHeight: 14,
     fontWeight: '500',
@@ -489,6 +501,7 @@ const styles = StyleSheet.create({
   /* PHOTO SALON */
 
   salonHeader: {
+    flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -496,15 +509,16 @@ const styles = StyleSheet.create({
   },
 
   viewAll: {
-    fontSize: 8,
-    lineHeight: 11,
+    fontFamily: Typography.bodySans.fontFamily,
+    fontSize: 10,
+    lineHeight: 14,
     fontWeight: '700',
     letterSpacing: 1.2,
     opacity: 0.5,
   },
 
   secondImageContainer: {
-    height: 320,
+    aspectRatio: 1,
     marginTop: Spacing.three,
     borderRadius: Radius.lg,
     overflow: 'hidden',
@@ -522,11 +536,12 @@ const styles = StyleSheet.create({
   },
 
   secondPlate: {
+    fontFamily: Typography.bodySans.fontFamily,
     position: 'absolute',
     left: 14,
     bottom: 12,
-    color: '#FFFFFF',
-    fontSize: 8,
+    color: Colors.light.onAccent,
+    fontSize: 10,
     lineHeight: 11,
     fontWeight: '700',
     letterSpacing: 1.2,

@@ -15,6 +15,7 @@ import { useTheme } from '@/hooks/use-theme';
 
 type AvatarProps = {
   uri?: string | null;
+  source?: number;
   name: string;
   size?: number;
   style?: StyleProp<ViewStyle>;
@@ -32,6 +33,7 @@ function initials(name: string) {
 
 export function Avatar({
   uri,
+  source,
   name,
   size = 56,
   style,
@@ -52,9 +54,10 @@ export function Avatar({
         style,
       ]}
     >
-      {uri ? (
+      {uri || source ? (
         <Image
-          source={{ uri }}
+          accessibilityLabel={`${name} profile photograph`}
+          source={source ?? { uri: uri! }}
           style={[
             StyleSheet.absoluteFill,
             {

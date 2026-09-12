@@ -14,7 +14,7 @@ import { useTheme } from '@/hooks/use-theme';
 
 export default function TabsLayoutWeb() {
   return (
-    <Tabs>
+    <Tabs style={styles.tabs}>
       <TabSlot style={styles.slot} />
       <TabList asChild>
         <WebTabList>
@@ -22,10 +22,13 @@ export default function TabsLayoutWeb() {
             <TabButton>Discover</TabButton>
           </TabTrigger>
           <TabTrigger name="explore" href="/explore" asChild>
-            <TabButton>Explore</TabButton>
+            <TabButton>Feed</TabButton>
           </TabTrigger>
           <TabTrigger name="matches" href="/matches" asChild>
-            <TabButton>Matches</TabButton>
+            <TabButton>Chats</TabButton>
+          </TabTrigger>
+          <TabTrigger name="profile" href="/profile" asChild>
+            <TabButton>Profile</TabButton>
           </TabTrigger>
         </WebTabList>
       </TabList>
@@ -37,14 +40,14 @@ function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps) {
   const theme = useTheme();
 
   return (
-    <Pressable {...props} style={({ pressed }) => pressed && styles.pressed}>
+    <Pressable {...props} style={({ pressed }) => [styles.trigger, pressed && styles.pressed]}>
       <View
         style={[
           styles.tab,
           { backgroundColor: isFocused ? theme.backgroundSelected : 'transparent' },
         ]}>
         <Text type="caption" tone={isFocused ? 'text' : 'textSecondary'}>
-          {children}
+          {typeof children === 'string' ? children.toUpperCase() : children}
         </Text>
       </View>
     </Pressable>
@@ -57,9 +60,6 @@ function WebTabList(props: TabListProps) {
   return (
     <View {...props} style={styles.bar}>
       <View style={[styles.inner, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-        <Text type="label" style={styles.brand}>
-          Vibe
-        </Text>
         {props.children}
       </View>
     </View>
@@ -67,11 +67,16 @@ function WebTabList(props: TabListProps) {
 }
 
 const styles = StyleSheet.create({
+  tabs: {
+    flex: 1,
+    minHeight: 0,
+  },
   slot: {
-    height: '100%',
+    flex: 1,
+    minHeight: 0,
   },
   bar: {
-    position: 'absolute',
+    flexShrink: 0,
     width: '100%',
     padding: Spacing.three,
     alignItems: 'center',
@@ -81,19 +86,19 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.two,
+    gap: Spacing.one,
     padding: Spacing.two,
-    borderRadius: 999,
+    borderRadius: 12,
     borderWidth: 1,
   },
-  brand: {
-    marginRight: 'auto',
-    marginLeft: Spacing.two,
-  },
+  trigger: { flex: 1, minWidth: 0 },
   tab: {
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: Spacing.one,
-    paddingHorizontal: Spacing.three,
-    borderRadius: 999,
+    paddingHorizontal: Spacing.one,
+    borderRadius: 12,
   },
   pressed: {
     opacity: 0.7,
